@@ -1,0 +1,293 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 29, 53, 87;
+  --background-start-rgb: 241, 250, 238;
+  --background-end-rgb: 255, 255, 255;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
+  background-size: 400% 400%;
+  animation: gradient-shift 15s ease infinite;
+  min-height: 100vh;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Glass morphism effect */
+.glass {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.glass-strong {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+/* Smooth transitions */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Blob animation */
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+/* Christmas theme animations */
+@keyframes snow {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.snowflake {
+  position: fixed;
+  top: -10px;
+  color: white;
+  font-size: 1em;
+  animation: snow linear infinite;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* Confetti Animation */
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+@keyframes confetti-side {
+  0% {
+    transform: translateY(-100vh) translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) translateX(100px) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.confetti {
+  position: fixed;
+  font-size: 2rem;
+  pointer-events: none;
+  z-index: 1000;
+  animation: confetti-fall 3s ease-out forwards;
+}
+
+.confetti-1 {
+  left: 10%;
+  animation-delay: 0s;
+  animation-duration: 2.5s;
+}
+
+.confetti-2 {
+  left: 20%;
+  animation-delay: 0.2s;
+  animation-duration: 3s;
+}
+
+.confetti-3 {
+  left: 30%;
+  animation-delay: 0.4s;
+  animation-duration: 2.8s;
+}
+
+.confetti-4 {
+  left: 40%;
+  animation-delay: 0.1s;
+  animation-duration: 3.2s;
+}
+
+.confetti-5 {
+  left: 50%;
+  animation-delay: 0.3s;
+  animation-duration: 2.7s;
+}
+
+.confetti-6 {
+  left: 60%;
+  animation-delay: 0.5s;
+  animation-duration: 3.1s;
+}
+
+.confetti-7 {
+  left: 70%;
+  animation-delay: 0.2s;
+  animation-duration: 2.9s;
+}
+
+.confetti-8 {
+  left: 80%;
+  animation-delay: 0.4s;
+  animation-duration: 3.3s;
+}
+
+/* Bounce In Animation */
+@keyframes bounce-in {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-bounce-in {
+  animation: bounce-in 0.6s ease-out;
+}
+
+/* Shake Animation for wrong answer */
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-10px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(10px);
+  }
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* Wobble Animation */
+@keyframes wobble {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-5deg);
+  }
+  75% {
+    transform: rotate(5deg);
+  }
+}
+
+.animate-wobble {
+  animation: wobble 0.6s ease-in-out infinite;
+}
+
+/* Wrong Answer Emoji Animation */
+@keyframes wrong-float {
+  0% {
+    transform: translateY(-100vh) translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(50vh) translateX(50px) rotate(180deg);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(100vh) translateX(-50px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.wrong-emoji {
+  position: fixed;
+  font-size: 2rem;
+  pointer-events: none;
+  z-index: 1000;
+  animation: wrong-float 3s ease-out forwards;
+}
+
+.wrong-1 {
+  left: 15%;
+  animation-delay: 0s;
+  animation-duration: 3s;
+}
+
+.wrong-2 {
+  left: 35%;
+  animation-delay: 0.3s;
+  animation-duration: 3.2s;
+}
+
+.wrong-3 {
+  left: 55%;
+  animation-delay: 0.1s;
+  animation-duration: 2.8s;
+}
+
+.wrong-4 {
+  left: 75%;
+  animation-delay: 0.2s;
+  animation-duration: 3.1s;
+}
+
