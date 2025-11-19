@@ -1,10 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import type { Question } from '@/lib/supabase'
-import Fireworks from '@/components/Fireworks'
 
 export default function QuestionPage() {
   const params = useParams()
@@ -20,9 +19,57 @@ export default function QuestionPage() {
   const [employeeEmail, setEmployeeEmail] = useState('')
   const [selectedAnswer, setSelectedAnswer] = useState<'A' | 'B' | 'C' | 'D' | ''>('')
 
+  const checkIfQuestionAnswered = useCallback(async (questionId: number, correctAnswer: string): Promise<boolean> => {
+    try {
+      // Get all answers for this question
+      const { data: answers, error } = await supabase
+        .from('answers')
+        .select('answer')
+        .eq('question_id', questionId)
+
+      if (error) throw error
+
+      // Check if any answer matches the correct answer
+      // The answer format is "A. option text", so we check if it starts with the correct letter
+      if (answers && answers.length > 0) {
+        const hasCorrectAnswer = answers.some((a) => 
+          a.answer.trim().toUpperCase().startsWith(correctAnswer.toUpperCase())
+        )
+        setQuestionAnswered(hasCorrectAnswer)
+        return hasCorrectAnswer
+      }
+      return false
+    } catch (error) {
+      console.error('Error checking if question answered:', error)
+      return false
+    }
+  }, [])
+
+  const fetchQuestion = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('questions')
+        .select('*')
+        .eq('unique_id', questionUniqueId)
+        .single()
+
+      if (error) throw error
+      setQuestion(data)
+      
+      // Check if question already has a correct answer
+      if (data) {
+        await checkIfQuestionAnswered(data.id, data.correct_answer)
+      }
+    } catch (error) {
+      console.error('Error fetching question:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [questionUniqueId, checkIfQuestionAnswered])
+
   useEffect(() => {
     fetchQuestion()
-  }, [questionUniqueId])
+  }, [fetchQuestion])
 
   // Set up real-time subscription to listen for new answers
   useEffect(() => {
@@ -59,54 +106,6 @@ export default function QuestionPage() {
       supabase.removeChannel(channel)
     }
   }, [question, questionAnswered, submitted])
-
-  async function fetchQuestion() {
-    try {
-      const { data, error } = await supabase
-        .from('questions')
-        .select('*')
-        .eq('unique_id', questionUniqueId)
-        .single()
-
-      if (error) throw error
-      setQuestion(data)
-      
-      // Check if question already has a correct answer
-      if (data) {
-        await checkIfQuestionAnswered(data.id, data.correct_answer)
-      }
-    } catch (error) {
-      console.error('Error fetching question:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  async function checkIfQuestionAnswered(questionId: number, correctAnswer: string): Promise<boolean> {
-    try {
-      // Get all answers for this question
-      const { data: answers, error } = await supabase
-        .from('answers')
-        .select('answer')
-        .eq('question_id', questionId)
-
-      if (error) throw error
-
-      // Check if any answer matches the correct answer
-      // The answer format is "A. option text", so we check if it starts with the correct letter
-      if (answers && answers.length > 0) {
-        const hasCorrectAnswer = answers.some((a) => 
-          a.answer.trim().toUpperCase().startsWith(correctAnswer.toUpperCase())
-        )
-        setQuestionAnswered(hasCorrectAnswer)
-        return hasCorrectAnswer
-      }
-      return false
-    } catch (error) {
-      console.error('Error checking if question answered:', error)
-      return false
-    }
-  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -290,9 +289,6 @@ export default function QuestionPage() {
   if (submitted) {
     return (
       <main className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-        {/* Fireworks Animation for correct answer */}
-        <Fireworks show={isCorrect} />
-        
         {/* Wrong answer animation */}
         {!isCorrect && !alreadySubmitted && (
           <>

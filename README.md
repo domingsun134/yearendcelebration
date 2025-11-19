@@ -93,6 +93,10 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - **Supabase** - Database and backend
 - **qrcode.react** - QR code generation
 
+## Deployment
+
+For detailed instructions on deploying to Render.com, see [DEPLOY.md](./DEPLOY.md).
+
 ## License
 
 MIT

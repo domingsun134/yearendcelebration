@@ -28,10 +28,14 @@ export default function SnowAnimation() {
       speed: number
       opacity: number
       wind: number
+      canvasWidth: number
+      canvasHeight: number
 
-      constructor() {
-        this.x = Math.random() * canvas.width
-        this.y = Math.random() * canvas.height
+      constructor(canvasWidth: number, canvasHeight: number) {
+        this.canvasWidth = canvasWidth
+        this.canvasHeight = canvasHeight
+        this.x = Math.random() * canvasWidth
+        this.y = Math.random() * canvasHeight
         this.radius = Math.random() * 3 + 1
         this.speed = Math.random() * 2 + 0.5
         this.opacity = Math.random() * 0.5 + 0.3
@@ -43,23 +47,23 @@ export default function SnowAnimation() {
         this.x += this.wind
 
         // Reset if snowflake goes off screen
-        if (this.y > canvas.height) {
+        if (this.y > this.canvasHeight) {
           this.y = 0
-          this.x = Math.random() * canvas.width
+          this.x = Math.random() * this.canvasWidth
         }
-        if (this.x > canvas.width) {
+        if (this.x > this.canvasWidth) {
           this.x = 0
         }
         if (this.x < 0) {
-          this.x = canvas.width
+          this.x = this.canvasWidth
         }
       }
 
-      draw() {
-        ctx.beginPath()
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2)
-        ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`
-        ctx.fill()
+      draw(context: CanvasRenderingContext2D) {
+        context.beginPath()
+        context.arc(this.x, this.y, this.radius, 0, Math.PI * 2)
+        context.fillStyle = `rgba(255, 255, 255, ${this.opacity})`
+        context.fill()
       }
     }
 
@@ -68,7 +72,7 @@ export default function SnowAnimation() {
     const snowflakeCount = Math.min(100, Math.floor((canvas.width * canvas.height) / 15000))
 
     for (let i = 0; i < snowflakeCount; i++) {
-      snowflakes.push(new Snowflake())
+      snowflakes.push(new Snowflake(canvas.width, canvas.height))
     }
 
     // Animation loop
@@ -78,7 +82,7 @@ export default function SnowAnimation() {
 
       snowflakes.forEach((snowflake) => {
         snowflake.update()
-        snowflake.draw()
+        snowflake.draw(ctx)
       })
 
       animationId = requestAnimationFrame(animate)

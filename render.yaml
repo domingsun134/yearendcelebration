@@ -1,0 +1,21 @@
+# Render.com Blueprint Configuration
+# This file can be used to automatically create services on Render.com
+# To use: Go to Render Dashboard > New > Blueprint > Connect this repo
+
+services:
+  - type: web
+    name: year-end-celebration
+    env: node
+    plan: free  # Change to 'starter' or 'standard' for production
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false  # Set this manually in Render dashboard
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        sync: false  # Set this manually in Render dashboard
+    # Uncomment and configure if you want a custom domain
+    # domains:
+    #   - your-domain.com
+    #   - www.your-domain.com
+
