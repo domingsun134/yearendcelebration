@@ -42,6 +42,49 @@ export default function AdminPage() {
     return answers.filter((a) => a.question_id === questionId)
   }
 
+  function getFirstCorrectAnswer(questionId: number) {
+    const question = questions.find((q) => q.id === questionId)
+    if (!question) return null
+
+    const questionAnswers = getQuestionAnswers(questionId)
+    const correctAnswers = questionAnswers
+      .filter((a) => {
+        const answerLetter = a.answer.trim().toUpperCase().charAt(0)
+        return answerLetter === question.correct_answer.toUpperCase()
+      })
+      .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+
+    return correctAnswers.length > 0 ? correctAnswers[0] : null
+  }
+
+  function getParticipantStats() {
+    const stats: Record<string, { email: string; correctCount: number; totalCount: number }> = {}
+
+    answers.forEach((answer) => {
+      const question = questions.find((q) => q.id === answer.question_id)
+      if (!question) return
+
+      const email = answer.employee_email
+      if (!stats[email]) {
+        stats[email] = { email, correctCount: 0, totalCount: 0 }
+      }
+
+      stats[email].totalCount++
+      const answerLetter = answer.answer.trim().toUpperCase().charAt(0)
+      if (answerLetter === question.correct_answer.toUpperCase()) {
+        stats[email].correctCount++
+      }
+    })
+
+    return Object.values(stats).sort((a, b) => {
+      // Sort by correct count (descending), then by total count (descending)
+      if (b.correctCount !== a.correctCount) {
+        return b.correctCount - a.correctCount
+      }
+      return b.totalCount - a.totalCount
+    })
+  }
+
   function getBaseUrl() {
     if (typeof window !== 'undefined') {
       return window.location.origin
@@ -125,6 +168,14 @@ export default function AdminPage() {
                   {seeding ? 'Seeding...' : 'Seed 100 Questions'}
                 </button>
               )}
+              {questions.length > 0 && (
+                <Link
+                  href="/admin/print-qr"
+                  className="px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl text-sm md:text-base font-semibold hover:shadow-glow hover:scale-105 transition-all duration-300 shadow-soft text-center"
+                >
+                  🖨️ Print QR Templates
+                </Link>
+              )}
               {answers.length > 0 && (
                 <button
                   onClick={deleteAllAnswers}
@@ -158,6 +209,80 @@ export default function AdminPage() {
               <div className="text-base md:text-lg font-semibold">Unique Participants</div>
             </div>
           </div>
+          
+          {/* Print QR Templates Card */}
+          {questions.length > 0 && (
+            <div className="mb-4 md:mb-6">
+              <Link
+                href="/admin/print-qr"
+                className="block bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 text-white p-6 md:p-8 rounded-xl md:rounded-2xl shadow-soft-lg hover:scale-105 transition-all duration-300 border-2 border-white/20 hover:border-white/40"
+              >
+                <div className="flex items-center gap-4 md:gap-6">
+                  <div className="text-5xl md:text-6xl lg:text-7xl">🖨️</div>
+                  <div className="flex-1">
+                    <h3 className="text-xl md:text-2xl lg:text-3xl font-bold mb-2">Print QR Code Templates</h3>
+                    <p className="text-sm md:text-base text-white/90">
+                      Generate and print all {questions.length} stocking templates with embedded QR codes
+                    </p>
+                  </div>
+                  <div className="text-3xl md:text-4xl">→</div>
+                </div>
+              </Link>
+            </div>
+          )}
+
+          {/* Participant Leaderboard */}
+          {answers.length > 0 && (
+            <div className="mb-4 md:mb-6 glass-strong rounded-2xl md:rounded-3xl shadow-soft-lg p-4 md:p-6 border border-white/20">
+              <h2 className="text-xl md:text-2xl font-display font-bold text-gray-800 mb-4 md:mb-6">
+                🏆 Participant Leaderboard
+              </h2>
+              <div className="space-y-3 max-h-[400px] overflow-y-auto">
+                {getParticipantStats().map((stat, index) => (
+                  <div
+                    key={stat.email}
+                    className={`p-3 md:p-4 border-2 rounded-xl transition-all duration-300 ${
+                      index === 0
+                        ? 'bg-gradient-to-r from-yellow-100 to-amber-100 border-yellow-400 shadow-soft-lg'
+                        : index === 1
+                        ? 'bg-gradient-to-r from-gray-100 to-slate-100 border-gray-300 shadow-soft'
+                        : index === 2
+                        ? 'bg-gradient-to-r from-orange-100 to-amber-100 border-orange-300 shadow-soft'
+                        : 'bg-white border-gray-200 hover:border-purple-300 hover:bg-purple-50'
+                    }`}
+                  >
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                      <div className="flex items-center gap-3">
+                        <div className={`text-xl md:text-2xl font-bold ${
+                          index === 0 ? 'text-yellow-600' : index === 1 ? 'text-gray-500' : index === 2 ? 'text-orange-600' : 'text-gray-400'
+                        }`}>
+                          {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
+                        </div>
+                        <div>
+                          <div className="font-semibold text-gray-800 text-sm md:text-base break-all">
+                            {stat.email}
+                          </div>
+                          <div className="text-xs md:text-sm text-gray-600">
+                            {stat.totalCount} total answer{stat.totalCount !== 1 ? 's' : ''}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className={`text-2xl md:text-3xl font-bold ${
+                          index === 0 ? 'text-yellow-700' : index === 1 ? 'text-gray-600' : index === 2 ? 'text-orange-700' : 'text-purple-600'
+                        }`}>
+                          {stat.correctCount}
+                        </div>
+                        <div className="text-xs md:text-sm text-gray-600">
+                          correct answer{stat.correctCount !== 1 ? 's' : ''}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
@@ -200,6 +325,23 @@ export default function AdminPage() {
                       <div className="text-xs md:text-sm text-gray-500 mt-2">
                         {getQuestionAnswers(q.id).length} answer(s)
                       </div>
+                      {(() => {
+                        const winner = getFirstCorrectAnswer(q.id)
+                        return winner ? (
+                          <div className="mt-2 p-2 bg-gradient-to-r from-yellow-100 to-amber-100 rounded-lg border border-yellow-300">
+                            <div className="text-xs md:text-sm font-semibold text-amber-800">
+                              🏆 Winner: {winner.employee_email}
+                            </div>
+                            <div className="text-xs text-amber-600">
+                              Answered at {new Date(winner.created_at).toLocaleString()}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="mt-2 text-xs md:text-sm text-gray-400 italic">
+                            No winner yet
+                          </div>
+                        )
+                      })()}
                     </div>
                     <button
                       onClick={(e) => {

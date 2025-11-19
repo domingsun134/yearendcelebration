@@ -4,3 +4,4 @@
 -- Rename the column from employee_name to employee_email
 ALTER TABLE answers RENAME COLUMN employee_name TO employee_email;
 
+

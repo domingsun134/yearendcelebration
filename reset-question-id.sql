@@ -13,3 +13,4 @@ ALTER SEQUENCE questions_id_seq RESTART WITH 1;
 -- Note: This could cause ID conflicts if you insert new rows
 -- SELECT setval('questions_id_seq', 1, false);
 
+

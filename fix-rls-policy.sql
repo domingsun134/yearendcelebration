@@ -6,3 +6,4 @@ DROP POLICY IF EXISTS "Anyone can insert questions" ON questions;
 CREATE POLICY "Anyone can insert questions" ON questions
   FOR INSERT WITH CHECK (true);
 
+
