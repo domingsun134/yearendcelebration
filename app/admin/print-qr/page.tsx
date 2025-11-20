@@ -6,6 +6,7 @@ import type { Question } from '@/lib/supabase'
 import { QRCodeSVG } from 'qrcode.react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 
 export default function PrintQRPage() {
   const [questions, setQuestions] = useState<Question[]>([])
@@ -218,11 +219,14 @@ function StockingPair({ questionId, qrValue }: { questionId: number; qrValue: st
 
 function StockingLeft({ questionId }: { questionId: number }) {
   return (
-    <div className="relative w-full" style={{ maxWidth: '400px' }}>
-      <img
+    <div className="w-full" style={{ maxWidth: '400px' }}>
+      <Image
         src="/sock-left.png"
-        alt="Left Sock"
+        alt={`Left Sock for question ${questionId}`}
+        width={409}
+        height={515}
         className="w-full h-auto"
+        priority
       />
     </div>
   )
@@ -231,10 +235,13 @@ function StockingLeft({ questionId }: { questionId: number }) {
 function StockingRight({ questionId, qrValue }: { questionId: number; qrValue: string }) {
   return (
     <div className="relative w-full" style={{ maxWidth: '400px' }}>
-      <img
+      <Image
         src="/sock-right.png"
-        alt="Right Sock"
+        alt={`Right Sock for question ${questionId}`}
+        width={411}
+        height={508}
         className="w-full h-auto"
+        priority
       />
 
       {/* QR Code overlay - positioned absolutely over the Image */}
