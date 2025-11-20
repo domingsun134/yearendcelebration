@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase'
 import type { Question, Answer } from '@/lib/supabase'
 import { QRCodeSVG } from 'qrcode.react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 export default function AdminPage() {
   const [questions, setQuestions] = useState<Question[]>([])
@@ -14,6 +15,8 @@ export default function AdminPage() {
   const [showQR, setShowQR] = useState<number | null>(null)
   const [seeding, setSeeding] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [loggingOut, setLoggingOut] = useState(false)
+  const router = useRouter()
 
   useEffect(() => {
     fetchData()
@@ -139,6 +142,20 @@ export default function AdminPage() {
     }
   }
 
+  async function handleLogout() {
+    setLoggingOut(true)
+    try {
+      await fetch('/api/admin/logout', { method: 'POST' })
+      router.push('/admin/login')
+      router.refresh()
+    } catch (error) {
+      console.error('Error logging out:', error)
+      alert('Failed to log out. Please try again.')
+    } finally {
+      setLoggingOut(false)
+    }
+  }
+
   if (loading) {
     return (
       <main className="min-h-screen flex items-center justify-center p-4">
@@ -185,12 +202,19 @@ export default function AdminPage() {
                   {deleting ? 'Deleting...' : 'Delete All Answers'}
                 </button>
               )}
-              <Link
-                href="/"
-                className="px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-christmas-green to-emerald-500 text-white rounded-xl text-sm md:text-base font-semibold hover:shadow-glow hover:scale-105 transition-all duration-300 shadow-soft text-center"
-              >
-                Home
-              </Link>
+                <Link
+                  href="/"
+                  className="px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-christmas-green to-emerald-500 text-white rounded-xl text-sm md:text-base font-semibold hover:shadow-glow hover:scale-105 transition-all duration-300 shadow-soft text-center"
+                >
+                  Home
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  disabled={loggingOut}
+                  className="px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl text-sm md:text-base font-semibold hover:shadow-glow hover:scale-105 transition-all duration-300 shadow-soft disabled:opacity-50 disabled:hover:scale-100"
+                >
+                  {loggingOut ? 'Logging out...' : 'Logout'}
+                </button>
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-4 md:mb-6">
