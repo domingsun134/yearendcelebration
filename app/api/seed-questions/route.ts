@@ -1,8 +1,17 @@
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { supabase } from '@/lib/supabase'
 import { christmasQuestions } from '@/data/christmas-questions'
 
+const ADMIN_COOKIE_NAME = process.env.ADMIN_COOKIE_NAME || 'admin-auth'
+
 export async function POST() {
+  const adminCookie = cookies().get(ADMIN_COOKIE_NAME)
+
+  if (!adminCookie || adminCookie.value !== 'true') {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     // Check if questions already exist
     const { data: existingQuestions } = await supabase

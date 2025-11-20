@@ -5,11 +5,15 @@ import { supabase } from '@/lib/supabase'
 import type { Question } from '@/lib/supabase'
 import { QRCodeSVG } from 'qrcode.react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 
 export default function PrintQRPage() {
   const [questions, setQuestions] = useState<Question[]>([])
   const [loading, setLoading] = useState(true)
   const [baseUrl, setBaseUrl] = useState('')
+  const [loggingOut, setLoggingOut] = useState(false)
+  const router = useRouter()
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -38,6 +42,20 @@ export default function PrintQRPage() {
     window.print()
   }
 
+  async function handleLogout() {
+    setLoggingOut(true)
+    try {
+      await fetch('/api/admin/logout', { method: 'POST' })
+      router.push('/admin/login')
+      router.refresh()
+    } catch (error) {
+      console.error('Error logging out:', error)
+      alert('Failed to log out. Please try again.')
+    } finally {
+      setLoggingOut(false)
+    }
+  }
+
   if (loading) {
     return (
       <main className="min-h-screen flex items-center justify-center p-4">
@@ -64,12 +82,19 @@ export default function PrintQRPage() {
             >
               🖨️ Print All
             </button>
-            <Link
-              href="/admin"
-              className="px-6 py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl font-semibold hover:shadow-glow hover:scale-105 transition-all duration-300 shadow-soft"
-            >
-              ← Back to Admin
-            </Link>
+              <Link
+                href="/admin"
+                className="px-6 py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl font-semibold hover:shadow-glow hover:scale-105 transition-all duration-300 shadow-soft"
+              >
+                ← Back to Admin
+              </Link>
+              <button
+                onClick={handleLogout}
+                disabled={loggingOut}
+                className="px-6 py-3 bg-gradient-to-r from-slate-600 to-slate-700 text-white rounded-xl font-semibold hover:shadow-glow hover:scale-105 transition-all duration-300 shadow-soft disabled:opacity-50 disabled:hover:scale-100"
+              >
+                {loggingOut ? 'Logging out...' : 'Logout'}
+              </button>
           </div>
         </div>
         <p className="text-sm text-gray-600 mt-2 max-w-7xl mx-auto">
@@ -194,11 +219,14 @@ function StockingPair({ questionId, qrValue }: { questionId: number; qrValue: st
 
 function StockingLeft({ questionId }: { questionId: number }) {
   return (
-    <div className="relative w-full" style={{ maxWidth: '400px' }}>
-      <img
+    <div className="w-full" style={{ maxWidth: '400px' }}>
+      <Image
         src="/sock-left.png"
-        alt="Left Sock"
+        alt={`Left Sock for question ${questionId}`}
+        width={409}
+        height={515}
         className="w-full h-auto"
+        priority
       />
     </div>
   )
@@ -207,10 +235,13 @@ function StockingLeft({ questionId }: { questionId: number }) {
 function StockingRight({ questionId, qrValue }: { questionId: number; qrValue: string }) {
   return (
     <div className="relative w-full" style={{ maxWidth: '400px' }}>
-      <img
+      <Image
         src="/sock-right.png"
-        alt="Right Sock"
+        alt={`Right Sock for question ${questionId}`}
+        width={411}
+        height={508}
         className="w-full h-auto"
+        priority
       />
 
       {/* QR Code overlay - positioned absolutely over the Image */}

@@ -32,6 +32,8 @@ Create a `.env.local` file in the root directory:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+ADMIN_PASSWORD=choose_a_secure_admin_password
+# Optional: ADMIN_COOKIE_NAME=admin-auth
 ```
 
 ### 4. Seed Questions
@@ -64,10 +66,11 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 3. Submit your response
 
 ### For Admins
-1. Go to `/admin` to access the dashboard
-2. View all questions and answers
-3. Click "Show QR" on any question to generate its QR code
-4. Print or display QR codes for employees to scan
+1. Go to `/admin/login` and sign in with the password set in `ADMIN_PASSWORD`
+2. After signing in, you'll be redirected to `/admin`
+3. View all questions and answers
+4. Click "Show QR" on any question to generate its QR code
+5. Print or display QR codes for employees to scan
 
 ## Project Structure
 

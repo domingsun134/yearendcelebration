@@ -33,6 +33,8 @@ Create a `.env.local` file in the root directory:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+ADMIN_PASSWORD=choose-a-secure-password
+# Optional: ADMIN_COOKIE_NAME=admin-auth
 ```
 
 Replace the values with your actual Supabase project URL and anon key.
@@ -41,9 +43,10 @@ Replace the values with your actual Supabase project URL and anon key.
 
 **Option A: Using the Admin Dashboard (Recommended)**
 1. Start the development server: `npm run dev`
-2. Open [http://localhost:3000/admin](http://localhost:3000/admin)
-3. Click the "Seed 100 Christmas Questions" button
-4. Wait for the success message
+2. Open [http://localhost:3000/admin/login](http://localhost:3000/admin/login)
+3. Sign in with the `ADMIN_PASSWORD`
+4. Click the "Seed 100 Christmas Questions" button
+5. Wait for the success message
 
 **Option B: Using the Script**
 ```bash
@@ -71,11 +74,12 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 3. Submit your response
 
 ### For Admins
-1. Go to `/admin` to access the dashboard
-2. View all questions and answers
-3. Click "Show QR" on any question to generate its QR code
-4. Print or display QR codes for employees to scan
-5. View all submitted answers in real-time
+1. Go to `/admin/login` and authenticate with the `ADMIN_PASSWORD`
+2. After signing in, access the dashboard at `/admin`
+3. View all questions and answers
+4. Click "Show QR" on any question to generate its QR code
+5. Print or display QR codes for employees to scan
+6. View all submitted answers in real-time
 
 ## Troubleshooting
 
