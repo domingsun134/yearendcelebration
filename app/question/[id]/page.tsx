@@ -15,35 +15,8 @@ export default function QuestionPage() {
   const [submitted, setSubmitted] = useState(false)
   const [isCorrect, setIsCorrect] = useState(false)
   const [alreadySubmitted, setAlreadySubmitted] = useState(false)
-  const [questionAnswered, setQuestionAnswered] = useState(false)
   const [employeeEmail, setEmployeeEmail] = useState('')
   const [selectedAnswer, setSelectedAnswer] = useState<'A' | 'B' | 'C' | 'D' | ''>('')
-
-  const checkIfQuestionAnswered = useCallback(async (questionId: number, correctAnswer: string): Promise<boolean> => {
-    try {
-      // Get all answers for this question
-      const { data: answers, error } = await supabase
-        .from('answers')
-        .select('answer')
-        .eq('question_id', questionId)
-
-      if (error) throw error
-
-      // Check if any answer matches the correct answer
-      // The answer format is "A. option text", so we check if it starts with the correct letter
-      if (answers && answers.length > 0) {
-        const hasCorrectAnswer = answers.some((a) => 
-          a.answer.trim().toUpperCase().startsWith(correctAnswer.toUpperCase())
-        )
-        setQuestionAnswered(hasCorrectAnswer)
-        return hasCorrectAnswer
-      }
-      return false
-    } catch (error) {
-      console.error('Error checking if question answered:', error)
-      return false
-    }
-  }, [])
 
   const fetchQuestion = useCallback(async () => {
     try {
@@ -55,57 +28,16 @@ export default function QuestionPage() {
 
       if (error) throw error
       setQuestion(data)
-      
-      // Check if question already has a correct answer
-      if (data) {
-        await checkIfQuestionAnswered(data.id, data.correct_answer)
-      }
     } catch (error) {
       console.error('Error fetching question:', error)
     } finally {
       setLoading(false)
     }
-  }, [questionUniqueId, checkIfQuestionAnswered])
+  }, [questionUniqueId])
 
   useEffect(() => {
     fetchQuestion()
   }, [fetchQuestion])
-
-  // Set up real-time subscription to listen for new answers
-  useEffect(() => {
-    if (!question || questionAnswered || submitted) {
-      return
-    }
-
-    // Subscribe to new answers for this question
-    const channel = supabase
-      .channel(`question-${question.id}-answers`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'answers',
-          filter: `question_id=eq.${question.id}`,
-        },
-        async (payload) => {
-          // A new answer was submitted for this question
-          const newAnswer = payload.new as { answer: string; question_id: number }
-          
-          // Check if this new answer is correct
-          if (question && newAnswer.answer.trim().toUpperCase().startsWith(question.correct_answer.toUpperCase())) {
-            // Someone just submitted a correct answer!
-            setQuestionAnswered(true)
-          }
-        }
-      )
-      .subscribe()
-
-    // Cleanup subscription on unmount or when question changes
-    return () => {
-      supabase.removeChannel(channel)
-    }
-  }, [question, questionAnswered, submitted])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -127,14 +59,6 @@ export default function QuestionPage() {
       
       if (!question) {
         alert('Question not found. Please refresh the page.')
-        return
-      }
-
-      // Check if question already has a correct answer
-      const alreadyAnswered = await checkIfQuestionAnswered(question.id, question.correct_answer)
-      if (alreadyAnswered) {
-        setQuestionAnswered(true)
-        setSubmitting(false)
         return
       }
 
@@ -163,16 +87,6 @@ export default function QuestionPage() {
       const correct = question && selectedAnswer === question.correct_answer
       setIsCorrect(correct || false)
 
-      // If answer is correct, check one more time if someone else just submitted correct answer
-      if (correct) {
-        const alreadyAnswered = await checkIfQuestionAnswered(question.id, question.correct_answer)
-        if (alreadyAnswered) {
-          setQuestionAnswered(true)
-          setSubmitting(false)
-          return
-        }
-      }
-
       const { error } = await supabase
         .from('answers')
         .insert({
@@ -190,38 +104,6 @@ export default function QuestionPage() {
           return
         }
         throw error
-      }
-
-      // After inserting, check again if question is now answered correctly
-      // This handles the case where someone else might have submitted at the same time
-      const nowAnswered = await checkIfQuestionAnswered(question.id, question.correct_answer)
-      
-      // If we submitted correct but someone else already had correct answer, show appropriate message
-      if (correct && nowAnswered) {
-        // Check if our answer was actually the first correct one
-        const { data: allAnswers } = await supabase
-          .from('answers')
-          .select('id, answer, employee_email, created_at')
-          .eq('question_id', question.id)
-          .order('created_at', { ascending: true })
-        
-        if (allAnswers) {
-          const correctAnswers = allAnswers.filter(a => 
-            a.answer.trim().toUpperCase().startsWith(question.correct_answer.toUpperCase())
-          )
-          // If there are multiple correct answers and ours is not the first, reject
-          if (correctAnswers.length > 1) {
-            const ourAnswer = allAnswers.find(a => a.employee_email === emailLower)
-            const firstCorrect = correctAnswers[0]
-            if (ourAnswer && ourAnswer.id !== firstCorrect.id) {
-              // Delete our answer since we weren't first
-              await supabase.from('answers').delete().eq('id', ourAnswer.id)
-              setQuestionAnswered(true)
-              setSubmitting(false)
-              return
-            }
-          }
-        }
       }
 
       setSubmitted(true)
@@ -252,29 +134,6 @@ export default function QuestionPage() {
           <h2 className="text-2xl md:text-3xl font-display font-bold text-gray-800 mb-6">
             Question not found
           </h2>
-          <button
-            onClick={() => router.push('/')}
-            className="px-6 md:px-8 py-2.5 md:py-3 bg-gradient-to-r from-christmas-green to-emerald-500 text-white rounded-xl text-sm md:text-base font-semibold hover:shadow-glow hover:scale-105 transition-all duration-300 shadow-soft"
-          >
-            Go Home
-          </button>
-        </div>
-      </main>
-    )
-  }
-
-  // Show message if question is already answered correctly
-  if (questionAnswered && !submitted) {
-    return (
-      <main className="min-h-screen flex items-center justify-center p-4">
-        <div className="glass-strong rounded-2xl md:rounded-3xl shadow-soft-lg p-6 md:p-8 lg:p-12 text-center max-w-2xl w-full mx-2 border border-white/10">
-          <div className="text-5xl md:text-7xl mb-4 md:mb-6">🎉</div>
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-display font-bold text-gray-800 mb-3 md:mb-4">
-            Question Already Answered
-          </h2>
-          <p className="text-base md:text-lg lg:text-xl text-gray-600 mb-6 md:mb-8 leading-relaxed px-2">
-            This question has already been answered correctly by someone else. No more submissions are allowed for this question.
-          </p>
           <button
             onClick={() => router.push('/')}
             className="px-6 md:px-8 py-2.5 md:py-3 bg-gradient-to-r from-christmas-green to-emerald-500 text-white rounded-xl text-sm md:text-base font-semibold hover:shadow-glow hover:scale-105 transition-all duration-300 shadow-soft"
@@ -350,13 +209,6 @@ export default function QuestionPage() {
           {question.question}
         </h1>
         <form onSubmit={handleSubmit} className="space-y-5 md:space-y-6 lg:space-y-8">
-          {questionAnswered && (
-            <div className="bg-yellow-50 border-2 border-yellow-400 rounded-xl p-4 mb-4">
-              <p className="text-sm md:text-base text-yellow-800 font-semibold">
-                ⚠️ This question has already been answered correctly. Submissions are now closed.
-              </p>
-            </div>
-          )}
           <div>
             <label
               htmlFor="employeeEmail"
@@ -409,9 +261,9 @@ export default function QuestionPage() {
               })}
             </div>
           </div>
-          <button
-            type="submit"
-            disabled={submitting || questionAnswered}
+            <button
+              type="submit"
+              disabled={submitting}
             className="w-full px-6 md:px-8 py-4 md:py-5 bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 text-white rounded-xl font-bold text-base md:text-lg hover:shadow-glow hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-soft-lg"
           >
             {submitting ? (
