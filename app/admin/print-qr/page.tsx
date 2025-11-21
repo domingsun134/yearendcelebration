@@ -7,6 +7,7 @@ import { QRCodeSVG } from 'qrcode.react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import { regretMessages } from '@/data/regret-messages'
 
 export default function PrintQRPage() {
   const [questions, setQuestions] = useState<Question[]>([])
@@ -97,30 +98,47 @@ export default function PrintQRPage() {
               </button>
           </div>
         </div>
-        <p className="text-sm text-gray-600 mt-2 max-w-7xl mx-auto">
-          This will print {questions.length} stocking templates with QR codes.
-        </p>
+          <p className="text-sm text-gray-600 mt-2 max-w-7xl mx-auto">
+            This will print {questions.length} quiz stocking templates plus {regretMessages.length} regret stocking QR codes.
+          </p>
       </div>
 
       {/* Print content */}
-      <div className="print-container p-4">
-        {questions.map((question) => (
-          <div key={question.id} className="print-page mb-8">
-            {/* Stocking Pair (Left and Right) */}
-            <div className="stocking-template">
-              {baseUrl ? (
-                <StockingPair
-                  questionId={question.id}
-                  qrValue={`${baseUrl}/question/${question.unique_id}`}
-                />
-              ) : (
-                <div className="w-full h-auto flex items-center justify-center" style={{ minHeight: '540px' }}>
-                  <div className="text-gray-500">Loading...</div>
-                </div>
-              )}
+        <div className="print-container p-4">
+          {questions.map((question) => (
+            <div key={question.id} className="print-page mb-8">
+              {/* Stocking Pair (Left and Right) */}
+              <div className="stocking-template">
+                {baseUrl ? (
+                  <StockingPair
+                    label={`Question ${question.id}`}
+                    qrValue={`${baseUrl}/question/${question.unique_id}`}
+                  />
+                ) : (
+                  <div className="w-full h-auto flex items-center justify-center" style={{ minHeight: '540px' }}>
+                    <div className="text-gray-500">Loading...</div>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+
+          {regretMessages.map((message) => (
+            <div key={message.id} className="print-page mb-8">
+              <div className="stocking-template">
+                {baseUrl ? (
+                  <StockingPair
+                    label={message.title}
+                    qrValue={`${baseUrl}/regret/${message.id}`}
+                  />
+                ) : (
+                  <div className="w-full h-auto flex items-center justify-center" style={{ minHeight: '540px' }}>
+                    <div className="text-gray-500">Loading...</div>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
       </div>
 
       <style jsx global>{`
@@ -208,21 +226,21 @@ export default function PrintQRPage() {
   )
 }
 
-function StockingPair({ questionId, qrValue }: { questionId: number; qrValue: string }) {
+function StockingPair({ label, qrValue }: { label: string; qrValue: string }) {
   return (
     <div className="flex flex-row items-center justify-center gap-4 w-full">
-      <StockingLeft questionId={questionId} />
-      <StockingRight questionId={questionId} qrValue={qrValue} />
+      <StockingLeft label={label} />
+      <StockingRight label={label} qrValue={qrValue} />
     </div>
   )
 }
 
-function StockingLeft({ questionId }: { questionId: number }) {
+function StockingLeft({ label }: { label: string }) {
   return (
     <div className="w-full" style={{ maxWidth: '400px' }}>
       <Image
         src="/sock-left.png"
-        alt={`Left Sock for question ${questionId}`}
+        alt={`Left Sock for ${label}`}
         width={409}
         height={515}
         className="w-full h-auto"
@@ -232,12 +250,12 @@ function StockingLeft({ questionId }: { questionId: number }) {
   )
 }
 
-function StockingRight({ questionId, qrValue }: { questionId: number; qrValue: string }) {
+function StockingRight({ label, qrValue }: { label: string; qrValue: string }) {
   return (
     <div className="relative w-full" style={{ maxWidth: '400px' }}>
       <Image
         src="/sock-right.png"
-        alt={`Right Sock for question ${questionId}`}
+        alt={`Right Sock for ${label}`}
         width={411}
         height={508}
         className="w-full h-auto"
