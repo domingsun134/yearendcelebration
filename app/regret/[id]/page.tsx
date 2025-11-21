@@ -45,7 +45,7 @@ export default function RegretMessagePage() {
   return (
     <main className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-pink-100 via-white to-emerald-100 opacity-70 pointer-events-none"></div>
-      <div className="glass-strong rounded-3xl shadow-soft-lg p-6 md:p-10 lg:p-12 text-center border border-white/10 max-w-3xl w-full relative z-10 bg-white/80 backdrop-blur-2xl">
+        <div className="glass-strong rounded-3xl shadow-soft-lg p-6 md:p-10 lg:p-12 text-center border border-white/10 max-w-3xl w-full relative z-10 bg-white/80 backdrop-blur-2xl">
         <div className="text-6xl md:text-7xl mb-6">🎄</div>
         <p className="text-sm uppercase tracking-[0.4em] text-gray-500 font-semibold mb-4">
           Sock Hunt Regret Message
@@ -59,20 +59,14 @@ export default function RegretMessagePage() {
         <p className="text-base md:text-lg text-gray-600 mb-8">
           Keep exploring Levels 4 &amp; 5 for the real clues. Santa’s magic is hiding somewhere else!
         </p>
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <button
-            onClick={() => router.back()}
-            className="px-6 py-3 bg-gradient-to-r from-gray-200 to-gray-300 rounded-xl font-semibold text-gray-800 hover:shadow-glow transition-all duration-300"
-          >
-            Try Another Sock
-          </button>
-          <Link
-            href="/"
-            className="px-6 py-3 bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 text-white rounded-xl font-semibold hover:shadow-glow transition-all duration-300"
-          >
-            Go to Home Base
-          </Link>
-        </div>
+          <div className="flex justify-center">
+            <button
+              onClick={() => router.back()}
+              className="px-6 py-3 bg-gradient-to-r from-gray-200 to-gray-300 rounded-xl font-semibold text-gray-800 hover:shadow-glow transition-all duration-300"
+            >
+              Try Another Sock
+            </button>
+          </div>
       </div>
       <div className="absolute -top-10 left-5 text-7xl opacity-20 pointer-events-none">🧦</div>
       <div className="absolute bottom-4 right-8 text-8xl opacity-20 pointer-events-none">🎅</div>
