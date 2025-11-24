@@ -71,6 +71,7 @@ ALTER TABLE answers ENABLE ROW LEVEL SECURITY;
 -- Drop existing policies if they exist (to avoid errors on re-run)
 DROP POLICY IF EXISTS "Anyone can read questions" ON questions;
 DROP POLICY IF EXISTS "Anyone can insert questions" ON questions;
+DROP POLICY IF EXISTS "Anyone can delete questions" ON questions;
 DROP POLICY IF EXISTS "Anyone can insert answers" ON answers;
 DROP POLICY IF EXISTS "Anyone can read answers" ON answers;
 DROP POLICY IF EXISTS "Anyone can delete answers" ON answers;
@@ -82,6 +83,10 @@ CREATE POLICY "Anyone can read questions" ON questions
 -- Allow anyone to insert questions (for seeding)
 CREATE POLICY "Anyone can insert questions" ON questions
   FOR INSERT WITH CHECK (true);
+
+-- Allow anyone to delete questions (for admin functionality)
+CREATE POLICY "Anyone can delete questions" ON questions
+  FOR DELETE USING (true);
 
 -- Allow anyone to insert answers
 CREATE POLICY "Anyone can insert answers" ON answers

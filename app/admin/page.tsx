@@ -16,6 +16,7 @@ export default function AdminPage() {
   const [seeding, setSeeding] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)
+  const [questionDeletingId, setQuestionDeletingId] = useState<number | null>(null)
   const router = useRouter()
 
   useEffect(() => {
@@ -139,6 +140,35 @@ export default function AdminPage() {
       alert('Failed to delete answers. Please make sure the DELETE policy is enabled in Supabase. Error: ' + (error as Error).message)
     } finally {
       setDeleting(false)
+    }
+  }
+
+  async function deleteQuestion(questionId: number) {
+    if (
+      !confirm(
+        'Are you sure you want to delete this question? All answers for it will be removed and this action cannot be undone.'
+      )
+    ) {
+      return
+    }
+
+    setQuestionDeletingId(questionId)
+    try {
+      const { error } = await supabase.from('questions').delete().eq('id', questionId)
+      if (error) throw error
+
+      setQuestions((prev) => prev.filter((q) => q.id !== questionId))
+      setAnswers((prev) => prev.filter((a) => a.question_id !== questionId))
+      setShowQR((prev) => (prev === questionId ? null : prev))
+      if (selectedQuestion === questionId) {
+        setSelectedQuestion(null)
+      }
+      alert('Question deleted successfully.')
+    } catch (error) {
+      console.error('Error deleting question:', error)
+      alert('Failed to delete question. Please make sure the DELETE policy is enabled in Supabase.')
+    } finally {
+      setQuestionDeletingId(null)
     }
   }
 
@@ -367,15 +397,27 @@ export default function AdminPage() {
                         )
                       })()}
                     </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setShowQR(showQR === q.id ? null : q.id)
-                      }}
-                      className="w-full sm:w-auto px-3 md:px-4 py-2 bg-gradient-to-r from-christmas-gold to-orange-400 text-white rounded-lg text-xs md:text-sm font-semibold hover:shadow-glow-gold hover:scale-105 transition-all duration-300 shadow-soft flex-shrink-0"
-                    >
-                      {showQR === q.id ? 'Hide QR' : 'Show QR'}
-                    </button>
+                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setShowQR(showQR === q.id ? null : q.id)
+                        }}
+                        className="w-full sm:w-auto px-3 md:px-4 py-2 bg-gradient-to-r from-christmas-gold to-orange-400 text-white rounded-lg text-xs md:text-sm font-semibold hover:shadow-glow-gold hover:scale-105 transition-all duration-300 shadow-soft flex-shrink-0"
+                      >
+                        {showQR === q.id ? 'Hide QR' : 'Show QR'}
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          deleteQuestion(q.id)
+                        }}
+                        disabled={questionDeletingId === q.id}
+                        className="w-full sm:w-auto px-3 md:px-4 py-2 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-lg text-xs md:text-sm font-semibold hover:shadow-glow hover:scale-105 transition-all duration-300 shadow-soft flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                      >
+                        {questionDeletingId === q.id ? 'Deleting...' : 'Delete'}
+                      </button>
+                    </div>
                   </div>
                   {showQR === q.id && (
                     <div className="mt-4 flex justify-center p-3 md:p-4 bg-white rounded-lg">
