@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { regretMessages } from '@/data/regret-messages'
 import { clues } from '@/data/clues'
+import { crackTheCodes } from '@/data/crack-the-code'
 
 export default function PrintQRPage() {
   const [questions, setQuestions] = useState<Question[]>([])
@@ -100,7 +101,7 @@ export default function PrintQRPage() {
           </div>
         </div>
           <p className="text-sm text-gray-600 mt-2 max-w-7xl mx-auto">
-            This will print {questions.length} quiz QR code stockings plus {regretMessages.length} regret QR code stockings plus {clues.length} clue QR code stockings.
+            This will print {questions.length} quiz QR code stockings plus {regretMessages.length} regret QR code stockings plus {clues.length} clue QR code stockings plus {crackTheCodes.length} crack the code templates.
           </p>
       </div>
 
@@ -148,6 +149,23 @@ export default function PrintQRPage() {
                   <StockingPair
                     label={clue.title}
                     qrValue={`${baseUrl}/clue/${clue.id}`}
+                  />
+                ) : (
+                  <div className="w-full h-auto flex items-center justify-center" style={{ minHeight: '540px' }}>
+                    <div className="text-gray-500">Loading...</div>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+
+          {crackTheCodes.map((code) => (
+            <div key={code.id} className="print-page mb-8">
+              <div className="stocking-template">
+                {baseUrl ? (
+                  <CrackTheCodeTemplate
+                    label={code.title}
+                    qrValue={`${baseUrl}/crack-the-code/${code.id}`}
                   />
                 ) : (
                   <div className="w-full h-auto flex items-center justify-center" style={{ minHeight: '540px' }}>
@@ -315,6 +333,54 @@ function StockingRight({ label, qrValue }: { label: string; qrValue: string }) {
           <QRCodeSVG
             value={qrValue}
             size={150}
+            level="H"
+            includeMargin={false}
+            style={{
+              width: '100%',
+              height: '100%',
+              maxWidth: '100%',
+              maxHeight: '100%'
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function CrackTheCodeTemplate({ label, qrValue }: { label: string; qrValue: string }) {
+  return (
+    <div className="relative w-full" style={{ maxWidth: '500px' }}>
+      <Image
+        src="/crack-the-code-template.png"
+        alt={`Crack the Code for ${label}`}
+        width={500}
+        height={700}
+        className="w-full h-auto"
+        priority
+      />
+
+      {/* QR Code overlay - positioned absolutely over the Image */}
+      {/* Positioned at the white square area in the upper part of the red teardrop */}
+      <div
+        className="absolute flex items-center justify-center"
+        style={{
+          left: '50%',
+          top: '22%',
+          transform: 'translateX(-50%)',
+          width: '38%',
+          aspectRatio: '1/1',
+        }}
+      >
+        <div
+          className="absolute inset-0 flex items-center justify-center"
+          style={{
+            // No background needed as the image already has a white box
+          }}
+        >
+          <QRCodeSVG
+            value={qrValue}
+            size={200}
             level="H"
             includeMargin={false}
             style={{

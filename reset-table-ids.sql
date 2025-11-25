@@ -38,3 +38,4 @@ ALTER SEQUENCE questions_id_seq RESTART WITH 1;
 -- ALTER SEQUENCE questions_id_seq RESTART WITH 100;
 -- ALTER SEQUENCE answers_id_seq RESTART WITH 100;
 
+

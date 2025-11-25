@@ -17,3 +17,4 @@ END $$;
 CREATE INDEX IF NOT EXISTS idx_answers_points ON answers(points);
 CREATE INDEX IF NOT EXISTS idx_answers_employee_email ON answers(employee_email);
 
+
