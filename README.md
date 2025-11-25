@@ -4,7 +4,7 @@ A modern web application for collecting employee answers to Christmas questions 
 
 ## Features
 
-- 🎄 100 Christmas-related multiple-choice questions (A, B, C, D)
+- 🎄 20 Christmas-related multiple-choice questions (A, B, C, D)
 - 📱 QR code generation for each question
 - 💾 Supabase database integration
 - 🎨 Modern, festive UI design
@@ -38,7 +38,7 @@ ADMIN_PASSWORD=choose_a_secure_admin_password
 
 ### 4. Seed Questions
 
-To populate the database with 100 Christmas questions, you can either:
+To populate the database with 20 Christmas questions, you can either:
 
 **Option A: Use the script (requires tsx)**
 ```bash
@@ -49,6 +49,8 @@ npx tsx scripts/generate-questions.ts
 **Option B: Insert manually via Supabase dashboard**
 - Go to Table Editor > questions
 - Insert the questions from `scripts/generate-questions.ts`
+
+> Need more or fewer questions later? Update the `CHRISTMAS_QUESTION_LIMIT` constant in `data/christmas-questions.ts` before seeding.
 
 ### 5. Run the Development Server
 
