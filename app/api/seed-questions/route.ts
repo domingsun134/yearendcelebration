@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { supabase } from '@/lib/supabase'
-import { christmasQuestions } from '@/data/christmas-questions'
+import { christmasQuestions, CHRISTMAS_QUESTION_LIMIT } from '@/data/christmas-questions'
 
 const ADMIN_COOKIE_NAME = process.env.ADMIN_COOKIE_NAME || 'admin-auth'
 
@@ -26,8 +26,10 @@ export async function POST() {
       )
     }
 
+    const questionsToSeed = christmasQuestions.slice(0, CHRISTMAS_QUESTION_LIMIT)
+
     // Insert questions
-    const questionsToInsert = christmasQuestions.map((q) => ({
+    const questionsToInsert = questionsToSeed.map((q) => ({
       question: q.question,
       option_a: q.option_a,
       option_b: q.option_b,

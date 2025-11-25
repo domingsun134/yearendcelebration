@@ -1,4 +1,4 @@
-// Script to generate and insert 100 Christmas questions into Supabase
+// Script to generate and insert up to 20 Christmas questions into Supabase
 // Run with: npx tsx scripts/generate-questions.ts
 // Make sure to set environment variables: NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY
 
@@ -8,6 +8,7 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey)
+const QUESTION_LIMIT = 20
 
 const christmasQuestions = [
   "What is the most popular Christmas song of all time?",
@@ -132,7 +133,7 @@ async function insertQuestions() {
   }
 
   // Insert questions
-  const questionsToInsert = christmasQuestions.map((q) => ({ question: q }))
+  const questionsToInsert = christmasQuestions.slice(0, QUESTION_LIMIT).map((q) => ({ question: q }))
   
   const { data, error } = await supabase
     .from('questions')

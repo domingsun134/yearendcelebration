@@ -45,7 +45,7 @@ Replace the values with your actual Supabase project URL and anon key.
 1. Start the development server: `npm run dev`
 2. Open [http://localhost:3000/admin/login](http://localhost:3000/admin/login)
 3. Sign in with the `ADMIN_PASSWORD`
-4. Click the "Seed 100 Christmas Questions" button
+4. Click the "Seed 20 Christmas Questions" button
 5. Wait for the success message
 
 **Option B: Using the Script**
@@ -57,6 +57,8 @@ export NEXT_PUBLIC_SUPABASE_ANON_KEY=your-key
 # Run the script
 npx tsx scripts/generate-questions.ts
 ```
+
+> Adjust the `CHRISTMAS_QUESTION_LIMIT` value in `data/christmas-questions.ts` if you need a different number of seeded questions.
 
 ### 6. Run the Application
 

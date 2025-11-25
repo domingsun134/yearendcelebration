@@ -212,7 +212,7 @@ export default function AdminPage() {
                   disabled={seeding}
                   className="px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-christmas-gold to-orange-400 text-white rounded-xl text-sm md:text-base font-semibold hover:shadow-glow-gold hover:scale-105 transition-all duration-300 shadow-soft disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
-                  {seeding ? 'Seeding...' : 'Seed 100 Questions'}
+                  {seeding ? 'Seeding...' : 'Seed 20 Questions'}
                 </button>
               )}
               {questions.length > 0 && (
@@ -351,7 +351,7 @@ export default function AdminPage() {
                   disabled={seeding}
                   className="px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-christmas-gold to-orange-400 text-white rounded-xl text-sm md:text-base font-semibold hover:shadow-glow-gold hover:scale-105 transition-all duration-300 shadow-soft disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
-                  {seeding ? 'Seeding Questions...' : 'Seed 100 Christmas Questions'}
+                  {seeding ? 'Seeding Questions...' : 'Seed 20 Christmas Questions'}
                 </button>
               </div>
             ) : (

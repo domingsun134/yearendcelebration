@@ -7,6 +7,8 @@ export interface QuestionData {
   correct_answer: 'A' | 'B' | 'C' | 'D'
 }
 
+export const CHRISTMAS_QUESTION_LIMIT = 20
+
 export const christmasQuestions: QuestionData[] = [
   // --- History & Traditions (Non-Religious) ---
   {
