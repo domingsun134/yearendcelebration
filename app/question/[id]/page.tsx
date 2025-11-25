@@ -87,12 +87,26 @@ export default function QuestionPage() {
       const correct = question && selectedAnswer === question.correct_answer
       setIsCorrect(correct || false)
 
+      // Calculate points based on question number
+      // Questions 1-18: 1 point, Question 19: 3 points, Question 20: 5 points
+      let points = 0
+      if (correct && question) {
+        if (question.id <= 18) {
+          points = 1
+        } else if (question.id === 19) {
+          points = 3
+        } else if (question.id === 20) {
+          points = 5
+        }
+      }
+
       const { error } = await supabase
         .from('answers')
         .insert({
           question_id: question.id,
           employee_email: emailLower,
           answer: answerText,
+          points: points,
         })
 
       if (error) {
@@ -179,6 +193,11 @@ export default function QuestionPage() {
               <p className="text-xl md:text-2xl lg:text-3xl text-christmas-green font-bold mb-2 md:mb-3">
                 You got it right!
               </p>
+              {question && (
+                <p className="text-lg md:text-xl lg:text-2xl text-purple-600 font-bold mb-2 md:mb-3">
+                  {question.id <= 18 ? '1 point' : question.id === 19 ? '3 points' : question.id === 20 ? '5 points' : '0 points'} earned! 🎉
+                </p>
+              )}
               <p className="text-base md:text-lg lg:text-xl text-gray-600 mb-6 md:mb-8 leading-relaxed px-2">
                 Your answer has been submitted successfully!
               </p>

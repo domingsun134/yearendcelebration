@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { regretMessages } from '@/data/regret-messages'
+import { clues } from '@/data/clues'
 
 export default function PrintQRPage() {
   const [questions, setQuestions] = useState<Question[]>([])
@@ -99,7 +100,7 @@ export default function PrintQRPage() {
           </div>
         </div>
           <p className="text-sm text-gray-600 mt-2 max-w-7xl mx-auto">
-            This will print {questions.length} quiz stocking templates plus {regretMessages.length} regret stocking QR codes.
+            This will print {questions.length} quiz QR code stockings plus {regretMessages.length} regret QR code stockings plus {clues.length} clue QR code stockings.
           </p>
       </div>
 
@@ -130,6 +131,23 @@ export default function PrintQRPage() {
                   <StockingPair
                     label={message.title}
                     qrValue={`${baseUrl}/regret/${message.id}`}
+                  />
+                ) : (
+                  <div className="w-full h-auto flex items-center justify-center" style={{ minHeight: '540px' }}>
+                    <div className="text-gray-500">Loading...</div>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+
+          {clues.map((clue) => (
+            <div key={clue.id} className="print-page mb-8">
+              <div className="stocking-template">
+                {baseUrl ? (
+                  <StockingPair
+                    label={clue.title}
+                    qrValue={`${baseUrl}/clue/${clue.id}`}
                   />
                 ) : (
                   <div className="w-full h-auto flex items-center justify-center" style={{ minHeight: '540px' }}>
@@ -229,23 +247,7 @@ export default function PrintQRPage() {
 function StockingPair({ label, qrValue }: { label: string; qrValue: string }) {
   return (
     <div className="flex flex-row items-center justify-center gap-4 w-full">
-      <StockingLeft label={label} />
       <StockingRight label={label} qrValue={qrValue} />
-    </div>
-  )
-}
-
-function StockingLeft({ label }: { label: string }) {
-  return (
-    <div className="w-full" style={{ maxWidth: '400px' }}>
-      <Image
-        src="/sock-left.png"
-        alt={`Left Sock for ${label}`}
-        width={409}
-        height={515}
-        className="w-full h-auto"
-        priority
-      />
     </div>
   )
 }
@@ -261,6 +263,36 @@ function StockingRight({ label, qrValue }: { label: string; qrValue: string }) {
         className="w-full h-auto"
         priority
       />
+
+      {/* Year End Celebration text overlay - positioned at the top green section */}
+      <div
+        className="absolute flex flex-col items-center justify-center"
+        style={{
+          left: '32%',
+          top: '4%',
+          transform: 'translateX(-50%)',
+          width: '80%',
+        }}
+      >
+        <div
+          className="text-white text-center"
+          style={{
+            fontFamily: "'Palatino', 'Palatino Linotype', 'Book Antiqua', 'Georgia', serif",
+            fontSize: 'clamp(15px, 3.2vw, 24px)',
+            fontWeight: '700',
+            letterSpacing: '0.2em',
+            textShadow: '3px 3px 8px rgba(0, 0, 0, 0.7), 1px 1px 2px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 255, 255, 0.1)',
+            lineHeight: '1.4',
+            textTransform: 'uppercase',
+            fontStyle: 'italic',
+            WebkitTextStroke: '0.3px rgba(0, 0, 0, 0.5)',
+            fontVariant: 'small-caps',
+          }}
+        >
+          <div style={{ marginBottom: '4px' }}>YEAR END</div>
+          <div>CELEBRATION</div>
+        </div>
+      </div>
 
       {/* QR Code overlay - positioned absolutely over the Image */}
       {/* Adjusted position based on the visual placeholder in the image */}

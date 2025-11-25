@@ -22,6 +22,7 @@ export type Answer = {
   question_id: number
   employee_email: string
   answer: string
+  points: number
   created_at: string
 }
 
