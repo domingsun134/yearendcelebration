@@ -21,7 +21,7 @@ export default function CluePage() {
             Clue not found!
           </h1>
           <p className="text-base md:text-lg text-gray-600 mb-6">
-            We couldn't find that clue. Try scanning another QR code or return to the start.
+            We couldn&apos;t find that clue. Try scanning another QR code or return to the start.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <button
