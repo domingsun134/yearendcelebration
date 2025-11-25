@@ -62,31 +62,28 @@ export default function AdminPage() {
   }
 
   function getParticipantStats() {
-    const stats: Record<string, { email: string; correctCount: number; totalCount: number }> = {}
+    const stats: Record<string, { email: string; totalPoints: number; totalCount: number }> = {}
 
     answers.forEach((answer) => {
-      const question = questions.find((q) => q.id === answer.question_id)
-      if (!question) return
-
       const email = answer.employee_email
       if (!stats[email]) {
-        stats[email] = { email, correctCount: 0, totalCount: 0 }
+        stats[email] = { email, totalPoints: 0, totalCount: 0 }
       }
 
       stats[email].totalCount++
-      const answerLetter = answer.answer.trim().toUpperCase().charAt(0)
-      if (answerLetter === question.correct_answer.toUpperCase()) {
-        stats[email].correctCount++
-      }
+      // Add points from the answer (points are already calculated when answer was submitted)
+      stats[email].totalPoints += answer.points || 0
     })
 
-    return Object.values(stats).sort((a, b) => {
-      // Sort by correct count (descending), then by total count (descending)
-      if (b.correctCount !== a.correctCount) {
-        return b.correctCount - a.correctCount
-      }
-      return b.totalCount - a.totalCount
-    })
+    return Object.values(stats)
+      .sort((a, b) => {
+        // Sort by total points (descending), then by total count (descending)
+        if (b.totalPoints !== a.totalPoints) {
+          return b.totalPoints - a.totalPoints
+        }
+        return b.totalCount - a.totalCount
+      })
+      .slice(0, 5) // Only show top 5
   }
 
   function getBaseUrl() {
@@ -289,7 +286,7 @@ export default function AdminPage() {
           {answers.length > 0 && (
             <div className="mb-4 md:mb-6 glass-strong rounded-2xl md:rounded-3xl shadow-soft-lg p-4 md:p-6 border border-white/20">
               <h2 className="text-xl md:text-2xl font-display font-bold text-gray-800 mb-4 md:mb-6">
-                🏆 Participant Leaderboard
+                🏆 Top 5 Leaderboard
               </h2>
               <div className="space-y-3 max-h-[400px] overflow-y-auto">
                 {getParticipantStats().map((stat, index) => (
@@ -325,10 +322,10 @@ export default function AdminPage() {
                         <div className={`text-2xl md:text-3xl font-bold ${
                           index === 0 ? 'text-yellow-700' : index === 1 ? 'text-gray-600' : index === 2 ? 'text-orange-700' : 'text-purple-600'
                         }`}>
-                          {stat.correctCount}
+                          {stat.totalPoints}
                         </div>
                         <div className="text-xs md:text-sm text-gray-600">
-                          correct answer{stat.correctCount !== 1 ? 's' : ''}
+                          point{stat.totalPoints !== 1 ? 's' : ''}
                         </div>
                       </div>
                     </div>
